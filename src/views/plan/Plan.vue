@@ -1,5 +1,16 @@
 <!--  -->
 <template>
+  <el-dialog v-model="dialogVisible" title="Tips" width="30%">
+    <span>This is a message</span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="dialogVisible = false">
+          Confirm
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
   <div class="common-layout">
     <el-container>
       <el-header>
@@ -11,45 +22,40 @@
           <div class="planlist">
             <el-input v-model="searchInput" class=" search" placeholder="search something" :prefix-icon="search" />
             <el-scrollbar :height="windowHeight - 60 - 60 - 32">
-              <el-card class="box-card" v-for="item in 5 ">
-                <template #header>
-                  <div class="card-header">
-                    <span>Card name</span>
-                    <div class="state">进行中</div>
-                  </div>
-                </template>
-                <div class="describe">
-                  <div class="identify">任务编号:27</div>
-                  <div class="start">开始时间:2023-1-1</div>
-                  <div class="deadline">截止时间:2023-1-20</div>
-                </div>
-              </el-card>
+              <Card state="now" end-time="2023-10-24"></Card>
+              <Card state="ready" end-time="2023-10-24"></Card>
+              <Card state="ready" end-time="2023-10-24"></Card>
+              <Card state="expire" end-time="2023-10-24"></Card>
+              <Card state="expire" end-time="2023-10-24"></Card>
             </el-scrollbar>
           </div>
           <div class="addplan">
-            <el-button text>+ 添加新任务</el-button>
+            <el-button text @click="addCompanyTask">+ 添加新任务</el-button>
           </div>
         </el-aside>
         <el-main>
           <div class="todo">
             <div class="text">今日任务:</div>
-            <el-progress :percentage="0" />
+            <el-progress :percentage="percent"  />
           </div>
-          <div class="today-list" >
-            <div class="card" v-if="addTask" tabindex="1" @blur="change">
-              <div class="text-area" tabindex="1">
+          <div class="today-list">
+            <el-scrollbar :height="windowHeight - 60 - 60 ">
+              <TaskToday :name="item.name"  :state="item.state" v-for="item in TodayTaskData"></TaskToday>
+            <div class="card" v-if="addTask">
+              <div class="text-area">
                 <el-input v-model="textarea2" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea"
                   placeholder="Please input" />
               </div>
-              <div class="date-select" tabindex="1">
-                <el-date-picker v-model="value1" type="date" placeholder="Pick a day" size="small" />
+              <div class="date-select">
+                <el-date-picker v-model="value1" type="date" placeholder="Pick a day" size="large" />
               </div>
-              <div class="btns" tabindex="1">
-                <el-button>确定</el-button>
+              <div class="btns">
+                <el-button type="primary">确定</el-button>
                 <el-button @click="change">取消</el-button>
               </div>
             </div>
             <el-button class="add-task" v-else text @click="change">+ 添加新任务</el-button>
+          </el-scrollbar>
           </div>
         </el-main>
       </el-container>
@@ -60,9 +66,13 @@
 
 <script lang='ts' setup>
 import { Search } from '@element-plus/icons-vue';
-import { reactive, toRefs, ref } from 'vue'
+import { reactive, toRefs, ref, onMounted } from 'vue'
 import Header from '@/components/Header.vue'
+import Card from '@/views/plan/Card.vue'
+import TaskToday from '@/views/plan/TaskToday.vue'
 import { useWindowSize } from '@vueuse/core'
+import { flatMap } from 'lodash';
+import { computed } from '@vue/reactivity';
 
 
 const { width, height } = useWindowSize()
@@ -72,17 +82,37 @@ const state = reactive({
   searchInput: '',
   windowWidth: width,
   windowHeight: height,
-  addTask:false,
-  textarea2:''
+  addTask: false,
+  textarea2: '',
+  dialogVisible: false,
+  TodayTaskData:[{
+    name:'第一个任务',
+    state:'finished'
+  },{
+    name:'第2个任务',
+    state:'ready'
+  },{
+    name:'第三个任务',
+    state:'ready'
+  }]
 
 })
-const { imgsrc, title, searchInput, windowWidth, windowHeight ,addTask,textarea2} = toRefs(state)
+const { imgsrc, title, searchInput, windowWidth, windowHeight, addTask, textarea2, dialogVisible ,TodayTaskData} = toRefs(state)
 
-const change =()=>{
+const change = () => {
   console.log("change");
-  
-  addTask.value =!addTask.value
+
+  addTask.value = !addTask.value
 }
+
+const addCompanyTask = () => {
+  dialogVisible.value = true
+}
+const percent = computed(()=>{
+  const finishedTask = TodayTaskData.value.filter(item => item.state==='finished')
+
+  return (finishedTask.length/TodayTaskData.value.length*100).toFixed(0)
+})
 </script>
 <style lang='less' scoped>
 .common-layout {
@@ -116,6 +146,57 @@ const change =()=>{
       }
 
       .today-list {
+        height: 100%;
+        background-color: #f5f5f5;
+        overflow: hidden;
+
+        .task-today {
+          margin-top: 10px;
+          width: 100%;
+          // height: 150px;
+          border: 2px solid #efefef;
+          border-radius: 5px;
+          padding: 10px;
+          box-sizing: border-box;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: flex-start;
+          background-color: white;
+
+          .title {
+            width: 100%;
+            // height: 20px;
+            padding: 10px;
+
+            h1 {
+              font-size: 20px;
+              margin: 0px;
+            }
+
+            .state {
+              background-color: #fa8888;
+              width: 80px;
+              font-size: 16px;
+              color: white;
+              border-radius: 5px;
+              text-align: center;
+            }
+          }
+
+          .describe {
+            display: flex;
+            flex-wrap: wrap;
+
+            div {
+              margin: 10px;
+              padding: 5px;
+              border-radius: 5px;
+              background-color: #f5f5f5;
+              color: #787878;
+            }
+          }
+        }
+
         .add-task {
           width: 100%;
           height: 40px;
@@ -124,21 +205,32 @@ const change =()=>{
 
         .card {
           width: 100%;
-          height: 150px;
           border: 2px solid #efefef;
+          padding: 10px;
           box-sizing: border-box;
           display: flex;
           justify-content: center;
           flex-wrap: wrap;
-          .text-area{
+          background-color: white;
+
+          .text-area {
             width: 100%;
           }
-          .date-select{
+
+          .date-select {
+            margin: 15px;
             width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
           }
-          .btns{
-            width:100%;
+
+          .btns {
+            display: flex;
+            align-items: center;
           }
+
+
           justify-content: center;
         }
       }
@@ -164,41 +256,6 @@ const change =()=>{
     font-size: 20px;
   }
 
-  .box-card {
-    margin: 10px;
-    border-left: 5px solid #fa8888;
-
-    .card-header {
-      font-size: 20px;
-
-      .state {
-        background-color: #fa8888;
-        width: 80px;
-        font-size: 16px;
-        color: white;
-        border-radius: 5px;
-        text-align: center;
-      }
-    }
-
-    .describe {
-      display: flex;
-      flex-wrap: wrap;
-
-      div {
-        margin: 10px;
-        padding: 5px;
-        border-radius: 5px;
-        background-color: #f5f5f5;
-        color: #787878;
-
-        &.deadline {
-          background-color: #fff1f1;
-          color: #ff7979;
-        }
-      }
-    }
-  }
 }
 
 .addplan {

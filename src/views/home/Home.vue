@@ -33,7 +33,7 @@ import { reactive, toRefs, ref, onMounted } from 'vue'
 const state = reactive({
   active: 0,
   menu:[{
-    index:"homepage",
+    index:"dashboard",
     src:"/src/assets/iconfont/home.svg",
     text:"首页"
   },{
