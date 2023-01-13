@@ -34,6 +34,7 @@ const props = defineProps({
   display: flex;
   justify-content:space-between;
   align-items: center;
+  background: #fff;
 
   .nav{
     display: flex;
