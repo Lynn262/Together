@@ -61,7 +61,7 @@
 <script lang='ts' setup>
 import { Search } from '@element-plus/icons-vue';
 import { reactive, toRefs, ref } from 'vue'
-import Header from '../../components/Header.vue'
+import Header from '@/components/Header.vue'
 import { useWindowSize } from '@vueuse/core'
 
 
