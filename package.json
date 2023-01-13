@@ -17,6 +17,7 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
+    "@types/node": "^18.11.18",
     "@vitejs/plugin-vue": "^4.0.0",
     "less": "^4.1.3",
     "less-loader": "^11.1.0",

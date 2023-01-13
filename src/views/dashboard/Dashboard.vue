@@ -15,13 +15,22 @@
 </template>
 
 <script lang='ts' setup>
-import { reactive, toRefs, ref } from 'vue'
-import Header from '../../components/Header.vue'
+import { reactive, toRefs, ref,computed } from 'vue'
+import Header from '@/components/Header.vue'
+import "@/assets/less/main.less"
+import { useStore } from 'vuex';
+import { useWindowSize } from '@vueuse/core';
+
+const store = useStore()
+
 const state=reactive({
   imgsrc:'/src/assets/iconfont/home-black.svg',
-  title:'首页'
+  title:'工作台'
 })
 const {imgsrc,title} = toRefs(state)
+const {height,width} = useWindowSize()
+
+
 </script>
 <style lang='less' scoped>
 .el-header{
