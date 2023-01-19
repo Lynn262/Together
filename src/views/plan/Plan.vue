@@ -1,12 +1,22 @@
 <!--  -->
 <template>
-  <el-dialog v-model="dialogVisible" title="Tips" width="30%">
-    <span>This is a message</span>
+  <el-dialog v-model="dialogVisible" title="添加任务" width="30%">
+    <el-form label-width="100px" :model="Form" style="max-width: 460px">
+      <el-form-item label="任务名称">
+        <el-input v-model="Form.name" />
+      </el-form-item>
+      <el-form-item label="开始时间">
+        <el-date-picker v-model="Form.startTime" type="date" placeholder="选择开始时间"  style="width:100%"/>
+      </el-form-item>
+      <el-form-item label="结束时间">
+        <el-date-picker v-model="Form.deadline" type="date" placeholder="选择结束时间" style="width:100%" />
+      </el-form-item>
+    </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogVisible = false">
-          Confirm
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="check">
+          确定
         </el-button>
       </span>
     </template>
@@ -20,13 +30,10 @@
 
         <el-aside width="50%">
           <div class="planlist">
-            <el-input v-model="searchInput" class=" search" placeholder="search something" :prefix-icon="search" />
+            <el-input v-model="searchInput" class=" search" placeholder="search something" :prefix-icon="search" @keyup.enter="searchTask"/>
             <el-scrollbar :height="windowHeight - 60 - 60 - 32">
-              <Card state="now" end-time="2023-10-24"></Card>
-              <Card state="ready" end-time="2023-10-24"></Card>
-              <Card state="ready" end-time="2023-10-24"></Card>
-              <Card state="expire" end-time="2023-10-24"></Card>
-              <Card state="expire" end-time="2023-10-24"></Card>
+              <Card :state="item.state" :end-time="item.endTime" :start-time="item.startTime" :name="item.name"
+                v-for="item, index in CardTaskData" :key="index"></Card>
             </el-scrollbar>
           </div>
           <div class="addplan">
@@ -36,26 +43,26 @@
         <el-main>
           <div class="todo">
             <div class="text">今日任务:</div>
-            <el-progress :percentage="percent"  />
+            <el-progress :percentage="percent" />
           </div>
           <div class="today-list">
-            <el-scrollbar :height="windowHeight - 60 - 60 ">
-              <TaskToday :name="item.name"  :state="item.state" v-for="item in TodayTaskData"></TaskToday>
-            <div class="card" v-if="addTask">
-              <div class="text-area">
-                <el-input v-model="textarea2" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea"
-                  placeholder="Please input" />
+            <el-scrollbar :height="windowHeight - 60 - 60">
+              <TaskToday :name="item.name" :state="item.state" v-for="item in TodayTaskData"></TaskToday>
+              <div class="card" v-if="addTask">
+                <div class="text-area">
+                  <el-input v-model="TaskForm.name" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea"
+                    placeholder="Please input" />
+                </div>
+                <div class="date-select">
+                  <el-date-picker v-model="TaskForm.deadline" type="date" placeholder="Pick a day" size="large" />
+                </div>
+                <div class="btns">
+                  <el-button type="primary">确定</el-button>
+                  <el-button @click="change">取消</el-button>
+                </div>
               </div>
-              <div class="date-select">
-                <el-date-picker v-model="value1" type="date" placeholder="Pick a day" size="large" />
-              </div>
-              <div class="btns">
-                <el-button type="primary">确定</el-button>
-                <el-button @click="change">取消</el-button>
-              </div>
-            </div>
-            <el-button class="add-task" v-else text @click="change">+ 添加新任务</el-button>
-          </el-scrollbar>
+              <el-button class="add-task" v-else text @click="change">+ 添加新任务</el-button>
+            </el-scrollbar>
           </div>
         </el-main>
       </el-container>
@@ -73,7 +80,7 @@ import TaskToday from '@/views/plan/TaskToday.vue'
 import { useWindowSize } from '@vueuse/core'
 import { flatMap } from 'lodash';
 import { computed } from '@vue/reactivity';
-
+import dayjs from 'dayjs'
 
 const { width, height } = useWindowSize()
 const state = reactive({
@@ -85,19 +92,53 @@ const state = reactive({
   addTask: false,
   textarea2: '',
   dialogVisible: false,
-  TodayTaskData:[{
-    name:'第一个任务',
-    state:'finished'
-  },{
-    name:'第2个任务',
-    state:'ready'
-  },{
-    name:'第三个任务',
-    state:'ready'
-  }]
-
+  TodayTaskData: [{
+    name: '第一个任务',
+    state: 'finished'
+  }, {
+    name: '第2个任务',
+    state: 'ready'
+  }, {
+    name: '第三个任务',
+    state: 'ready'
+  }],
+  CardTaskData: [{
+    name: '任务1',
+    state: 'ready',
+    startTime: '2023-1-1',
+    endTime: '2023-1-1'
+  }, {
+    name: '任务1',
+    state: 'now',
+    startTime: '2023-1-1',
+    endTime: '2023-1-1'
+  }, {
+    name: '任务1',
+    state: 'ready',
+    startTime: '2023-1-1',
+    endTime: '2023-1-1'
+  }, {
+    name:'这是一个任务',
+    state: 'expire',
+    startTime: '2023-1-1',
+    endTime: '2023-1-1'
+  }, {
+    name: '任务1',
+    state: 'expire',
+    startTime: '2023-1-1',
+    endTime: '2023-1-1'
+  },],
+  Form: {
+    name: '',
+    startTime: '',
+    deadline: ''
+  },
+  TaskForm:{
+    name:'',
+    deadline:''
+  }
 })
-const { imgsrc, title, searchInput, windowWidth, windowHeight, addTask, textarea2, dialogVisible ,TodayTaskData} = toRefs(state)
+const { imgsrc, title, searchInput, windowWidth, windowHeight, addTask, textarea2, dialogVisible, TodayTaskData, Form, CardTaskData,TaskForm } = toRefs(state)
 
 const change = () => {
   console.log("change");
@@ -108,11 +149,37 @@ const change = () => {
 const addCompanyTask = () => {
   dialogVisible.value = true
 }
-const percent = computed(()=>{
-  const finishedTask = TodayTaskData.value.filter(item => item.state==='finished')
-
-  return (finishedTask.length/TodayTaskData.value.length*100).toFixed(0)
+const percent = computed(() => {
+  const finishedTask = TodayTaskData.value.filter(item => item.state === 'finished')
+  return (finishedTask.length / TodayTaskData.value.length * 100).toFixed(0)
 })
+
+const searchTask = ()=>{
+  //这里是查询到的任务
+  const CardFilter = CardTaskData.value.filter(item=>
+    item.name.indexOf(searchInput.value)!==-1
+  )
+  console.log(CardFilter);
+  
+}
+
+const check = () => {
+  const before = dayjs().isBefore(dayjs(Form.value.startTime))
+  const after = dayjs().isAfter(dayjs(Form.value.deadline))
+  const obj = {
+    name: Form.value.name,
+    state: after?'expire':before?'ready':'now',
+    startTime: dayjs(Form.value.startTime).format('YYYY-MM-DD'),
+    endTime: dayjs(Form.value.deadline).format('YYYY-MM-DD')
+  }
+  CardTaskData.value.push(obj)
+  Form.value = {
+    name: '',
+    startTime: '',
+    deadline: ''
+  }
+  dialogVisible.value = false
+}
 </script>
 <style lang='less' scoped>
 .common-layout {
