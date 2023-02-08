@@ -3,5 +3,6 @@
 /src/assets/js
 /src/views
 /package-lock.json
+/package.json
 .DS_Store
 vue.config.js
