@@ -20,6 +20,6 @@
       ]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/store/vuex.d.ts/vuex.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }],
 }
