@@ -4,9 +4,7 @@
 			<div class="card-header">
 				<span>{{ name }}</span>
 				<div class="state">
-					{{
-						state === "now" ? "进行中" : state === "ready" ? "未开始" : "已逾期"
-					}}
+					{{ state === "now" ? "进行中" : state === "ready" ? "未开始" : "已逾期" }}
 				</div>
 			</div>
 		</template>

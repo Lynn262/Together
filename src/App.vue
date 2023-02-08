@@ -1,6 +1,5 @@
-
 <template>
-  <router-view></router-view>
+	<router-view></router-view>
 </template>
 
 <script setup lang="ts">
@@ -11,7 +10,7 @@ import "@/assets/less/elementplusCustom.less";
 
 <style scoped>
 #app {
-  height: 100%;
-  width: 100%;
+	height: 100%;
+	width: 100%;
 }
 </style>

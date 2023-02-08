@@ -19,19 +19,21 @@
     ],
     "rules": {
         "indent": [
-            "off",
+            "error",
             "tab"
         ],
         "quotes": [
-            "off",
+            "error",
             "double"
         ],
         "semi": [
-            "off",
+            "error",
             "always"
         ],
         "vue/multi-word-component-names": "off",
         "no-unused-vars":"off",
-        "vue/prefer-import-from-vue":"off"
+        "vue/prefer-import-from-vue":"off",
+        "array-bracket-newline":"off",
+        "max-len": "off"
     }
 }

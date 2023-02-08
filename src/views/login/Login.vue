@@ -6,12 +6,7 @@
 				<h1>登录</h1>
 				<div class="login_item">
 					<!-- 登陆的表单项 -->
-					<el-form
-						ref="ruleFormRef"
-						:model="ruleForm"
-						status-icon
-						:rules="rules"
-					>
+					<el-form ref="ruleFormRef" :model="ruleForm" status-icon :rules="rules">
 						<el-form-item prop="username">
 							<el-input v-model="ruleForm.username" placeholder="请输入用户名">
 								<template #prefix>
@@ -22,11 +17,7 @@
 							</el-input>
 						</el-form-item>
 						<el-form-item prop="password">
-							<el-input
-								v-model="ruleForm.password"
-								type="password"
-								placeholder="请输入密码"
-							>
+							<el-input v-model="ruleForm.password" type="password" placeholder="请输入密码">
 								<template #prefix>
 									<el-icon>
 										<Lock />
@@ -56,11 +47,7 @@ const state = reactive({
 	},
 });
 //校验密码的规则
-const validatePass = (
-	rule: unknown,
-	value: string | undefined,
-	cb: (msg?: string) => void
-) => {
+const validatePass = (rule: unknown, value: string | undefined, cb: (msg?: string) => void) => {
 	if (!value) {
 		cb("密码不能为空");
 	} else {

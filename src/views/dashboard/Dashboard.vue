@@ -22,41 +22,42 @@
 						</el-button>
 					</DashboardController>
 				</el-header>
-				<el-container
-					:style="{ height: `${dashboardSize.heightComputed}px` }"
-					:direction="dashboardLayout === 'desktop' ? `horizontal` : `vertical`"
-				>
+				<el-container :style="{ height: `${dashboardSize.heightComputed}px` }" :direction="dashboardLayout === 'desktop' ? `horizontal` : `vertical`">
 					<!-- 仪表盘的主体：用min-width 大于1100时可以计算，小于768可以计算，在中间的情况不计算 -->
 					<el-scrollbar :max-height="`1100px`">
 						<el-container
 							class="dashboard-wrap"
-							:style="{ height: `${dashboardSize.heightComputed}px` }"
-							:direction="
-								dashboardLayout === 'desktop' ? `horizontal` : `vertical`
-							"
-						>
+							:style="{
+								height: `${dashboardSize.heightComputed}px`,
+							}"
+							:direction="dashboardLayout === 'desktop' ? `horizontal` : `vertical`">
 							<div
 								:style="{
-									width:
-										dashboardSize.widthComputed *
-											(dashboardLayout === 'desktop' ? 0.6 : 1) +
-										'px',
-								}"
-							>
+									width: dashboardSize.widthComputed * (dashboardLayout === 'desktop' ? 0.6 : 1) + 'px',
+								}">
 								<DashboardCard :plus-text="`新建任务`">
 									<template #title>{{ `我的任务` }}</template>
-									<template #body><task-card></task-card></template>
+									<template #body>
+										<!-- 还未完成的任务 -->
+										<div>
+											<task-card :is-controller="true" :task-list-id="`notFinish`" :is-collapse="collapseInTaskCard.notFinishCollapse">
+												<p>未完成</p>
+											</task-card>
+										</div>
+										<div>
+											<!-- 已经过期的任务 -->
+											<task-card :is-controller="true" :task-list-id="`over`" :is-collapse="collapseInTaskCard.overCollapse">
+												<p>已过期</p>
+											</task-card>
+										</div>
+									</template>
 								</DashboardCard>
 							</div>
 							<el-scrollbar
 								:style="{
-									width:
-										dashboardSize.widthComputed *
-											(dashboardLayout === 'desktop' ? 0.4 : 1) +
-										'px',
+									width: dashboardSize.widthComputed * (dashboardLayout === 'desktop' ? 0.4 : 1) + 'px',
 								}"
-								:view-class="`left-scrollbar`"
-							>
+								:view-class="`left-scrollbar`">
 								<DashboardCard :plus-text="`新建任务`">
 									<template #title>{{ `我的日程` }}</template>
 									<template #body><el-scrollbar></el-scrollbar></template>
@@ -77,15 +78,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-	reactive,
-	toRefs,
-	ref,
-	computed,
-	defineProps,
-	ComputedRef,
-	Ref,
-} from "vue";
+import { reactive, toRefs, ref, computed, defineProps, ComputedRef, Ref } from "vue";
 import Header from "@/components/Header.vue";
 import DashboardController from "@/views/dashboard/components/DashboardController.vue";
 import "@/assets/less/main.less";
@@ -93,7 +86,7 @@ import { useWindowSize } from "@vueuse/core";
 import { Refresh, EditPen } from "@element-plus/icons-vue";
 import DashboardCard from "@/views/dashboard/components/DashboardCard.vue";
 import { useStore } from "@/store/index";
-import TaskCard from "./components/task/TaskCard.vue";
+import TaskCard from "./components/task/TaskCardTitle.vue";
 
 interface windowSizeInterface {
 	heightComputed: number;
@@ -111,23 +104,25 @@ const { imgsrc, title } = toRefs(state);
 const windowHeight: Ref<number> = useWindowSize().height;
 const windowWidth: Ref<number> = useWindowSize().width;
 // 仪表盘的主体：用min-width 大于1100时可以计算，小于768可以计算，在中间的情况不计算
-const dashboardSize: ComputedRef<windowSizeInterface> =
-	computed<windowSizeInterface>(() => {
-		let heightComputed = windowHeight.value - 100;
-		let widthComputed = 0;
-		if (
-			windowWidth.value - store.state.asideWidth < 1100 &&
-			windowWidth.value - store.state.asideWidth > 768
-		) {
-			widthComputed = 1100;
-		} else {
-			widthComputed = windowWidth.value - store.state.asideWidth;
-		}
-		return { heightComputed: heightComputed, widthComputed: widthComputed };
-	});
+const dashboardSize: ComputedRef<windowSizeInterface> = computed<windowSizeInterface>(() => {
+	let heightComputed = windowHeight.value - 100;
+	let widthComputed = 0;
+	if (windowWidth.value - store.state.asideWidth < 1100 && windowWidth.value - store.state.asideWidth > 768) {
+		widthComputed = 1100;
+	} else {
+		widthComputed = windowWidth.value - store.state.asideWidth;
+	}
+	return { heightComputed: heightComputed, widthComputed: widthComputed };
+});
 
 const dashboardLayout: ComputedRef<string> = computed<string>(() => {
 	return store.getters.deviceType;
+});
+
+// 该对象标记两个折叠栏是否折叠，默认为打开（false）
+const collapseInTaskCard = reactive({
+	notFinishCollapse: false,
+	overCollapse: false,
 });
 
 const editableHeaderButtonText = ref("设置面板");

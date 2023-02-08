@@ -4,15 +4,7 @@
 		<div class="title">
 			<h1>{{ name }}</h1>
 			<div class="state">
-				{{
-					state === "now"
-						? "进行中"
-						: state === "ready"
-						? "未开始"
-						: state === "finished"
-						? "已完成"
-						: "已逾期"
-				}}
+				{{ state === "now" ? "进行中" : state === "ready" ? "未开始" : state === "finished" ? "已完成" : "已逾期" }}
 			</div>
 		</div>
 		<div class="describe">

@@ -1,31 +1,15 @@
 <template>
 	<el-container>
 		<el-aside :width="store.state.asideWidth + 'px'">
-			<el-menu
-				active-text-color="#fff"
-				:collapse="isCollapse"
-				:collapse-transition="false"
-				default-active="homepage"
-				text-color="#fff"
-				router
-			>
+			<el-menu active-text-color="#fff" :collapse="isCollapse" :collapse-transition="false" default-active="homepage" text-color="#fff" router>
 				<div class="logo"><img src="../../assets/vue.svg" /></div>
-				<el-menu-item
-					v-for="item in menu"
-					:index="item.index"
-					v-bind:key="item.index"
-				>
+				<el-menu-item v-for="item in menu" :index="item.index" v-bind:key="item.index">
 					<img :src="item.src" alt="" />
 					<span>{{ item.text }}</span>
 				</el-menu-item>
 
 				<div class="showdown" @click="collapse">
-					<img
-						src="../../assets/iconfont/shouqicaidan_menu-fold.svg"
-						alt=""
-						height="100%"
-						width="100%"
-					/>
+					<img src="../../assets/iconfont/shouqicaidan_menu-fold.svg" alt="" height="100%" width="100%" />
 					<span v-show="!isCollapse">收起菜单</span>
 				</div>
 			</el-menu>

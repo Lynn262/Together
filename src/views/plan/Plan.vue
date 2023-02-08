@@ -6,20 +6,10 @@
 				<el-input v-model="Form.name" />
 			</el-form-item>
 			<el-form-item label="开始时间">
-				<el-date-picker
-					v-model="Form.startTime"
-					type="date"
-					placeholder="选择开始时间"
-					style="width: 100%"
-				/>
+				<el-date-picker v-model="Form.startTime" type="date" placeholder="选择开始时间" style="width: 100%" />
 			</el-form-item>
 			<el-form-item label="结束时间">
-				<el-date-picker
-					v-model="Form.deadline"
-					type="date"
-					placeholder="选择结束时间"
-					style="width: 100%"
-				/>
+				<el-date-picker v-model="Form.deadline" type="date" placeholder="选择结束时间" style="width: 100%" />
 			</el-form-item>
 		</el-form>
 		<template #footer>
@@ -37,22 +27,9 @@
 			<el-container>
 				<el-aside width="50%">
 					<div class="planlist">
-						<el-input
-							v-model="searchInput"
-							class="search"
-							placeholder="search something"
-							:prefix-icon="`search`"
-							@keyup.enter="searchTask"
-						/>
+						<el-input v-model="searchInput" class="search" placeholder="search something" :prefix-icon="`search`" @keyup.enter="searchTask" />
 						<el-scrollbar :height="windowHeight - 60 - 60 - 32">
-							<Card
-								:state="item.state"
-								:end-time="item.endTime"
-								:start-time="item.startTime"
-								:name="item.name"
-								v-for="(item, index) in CardTaskData"
-								:key="index"
-							></Card>
+							<Card :state="item.state" :end-time="item.endTime" :start-time="item.startTime" :name="item.name" v-for="(item, index) in CardTaskData" :key="index"></Card>
 						</el-scrollbar>
 					</div>
 					<div class="addplan">
@@ -66,37 +43,20 @@
 					</div>
 					<div class="today-list">
 						<el-scrollbar :height="windowHeight - 60 - 60">
-							<TaskToday
-								v-for="(item, index) in TodayTaskData"
-								:name="item.name"
-								:state="item.state"
-								:key="index"
-							></TaskToday>
+							<TaskToday v-for="(item, index) in TodayTaskData" :name="item.name" :state="item.state" :key="index"></TaskToday>
 							<div class="card" v-if="addTask">
 								<div class="text-area">
-									<el-input
-										v-model="TaskForm.name"
-										:autosize="{ minRows: 2, maxRows: 4 }"
-										type="textarea"
-										placeholder="Please input"
-									/>
+									<el-input v-model="TaskForm.name" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="Please input" />
 								</div>
 								<div class="date-select">
-									<el-date-picker
-										v-model="TaskForm.deadline"
-										type="date"
-										placeholder="Pick a day"
-										size="large"
-									/>
+									<el-date-picker v-model="TaskForm.deadline" type="date" placeholder="Pick a day" size="large" />
 								</div>
 								<div class="btns">
 									<el-button type="primary">确定</el-button>
 									<el-button @click="change">取消</el-button>
 								</div>
 							</div>
-							<el-button class="add-task" v-else text @click="change">
-								+ 添加新任务
-							</el-button>
+							<el-button class="add-task" v-else text @click="change">+ 添加新任务</el-button>
 						</el-scrollbar>
 					</div>
 				</el-main>
@@ -182,20 +142,7 @@ const state = reactive({
 		deadline: "",
 	},
 });
-const {
-	imgsrc,
-	title,
-	searchInput,
-	windowWidth,
-	windowHeight,
-	addTask,
-	textarea2,
-	dialogVisible,
-	TodayTaskData,
-	Form,
-	CardTaskData,
-	TaskForm,
-} = toRefs(state);
+const { imgsrc, title, searchInput, windowWidth, windowHeight, addTask, textarea2, dialogVisible, TodayTaskData, Form, CardTaskData, TaskForm } = toRefs(state);
 
 const change = () => {
 	console.log("change");
@@ -207,19 +154,13 @@ const addCompanyTask = () => {
 	dialogVisible.value = true;
 };
 const percent = computed(() => {
-	const finishedTask = TodayTaskData.value.filter(
-		(item) => item.state === "finished"
-	);
-	return parseInt(
-		((finishedTask.length / TodayTaskData.value.length) * 100).toFixed(0)
-	);
+	const finishedTask = TodayTaskData.value.filter((item) => item.state === "finished");
+	return parseInt(((finishedTask.length / TodayTaskData.value.length) * 100).toFixed(0));
 });
 
 const searchTask = () => {
 	//这里是查询到的任务
-	const CardFilter = CardTaskData.value.filter(
-		(item) => item.name.indexOf(searchInput.value) !== -1
-	);
+	const CardFilter = CardTaskData.value.filter((item) => item.name.indexOf(searchInput.value) !== -1);
 	console.log(CardFilter);
 };
 
