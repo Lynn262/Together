@@ -29,7 +29,7 @@
 					<div class="planlist">
 						<el-input v-model="searchInput" class="search" placeholder="search something" :prefix-icon="`search`" @keyup.enter="searchTask" />
 						<el-scrollbar :height="windowHeight - 60 - 60 - 32">
-							<Card :state="item.state" :end-time="item.endTime" :start-time="item.startTime" :name="item.name" v-for="(item, index) in CardTaskData" :key="index"></Card>
+							<Card :state="(item.state as stateType)" :end-time="item.endTime" :start-time="item.startTime" :name="item.name" v-for="(item, index) in CardTaskData" :key="index"></Card>
 						</el-scrollbar>
 					</div>
 					<div class="addplan">
@@ -75,6 +75,7 @@ import { useWindowSize } from "@vueuse/core";
 import { flatMap } from "lodash";
 import { computed } from "@vue/reactivity";
 import dayjs from "dayjs";
+import { stateType } from "@/utils/PriorityColorCompute";
 
 const { width, height } = useWindowSize();
 const state = reactive({
@@ -105,7 +106,7 @@ const state = reactive({
 			name: "任务1",
 			state: "ready",
 			startTime: "2023-1-1",
-			endTime: "2023-1-1",
+			endTime: "2023-1-2",
 		},
 		{
 			name: "任务1",
@@ -146,7 +147,6 @@ const { imgsrc, title, searchInput, windowWidth, windowHeight, addTask, textarea
 
 const change = () => {
 	console.log("change");
-
 	addTask.value = !addTask.value;
 };
 

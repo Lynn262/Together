@@ -40,15 +40,15 @@
 									<template #body>
 										<!-- 还未完成的任务 -->
 										<div>
-											<task-card :is-controller="true" :task-list-id="`notFinish`" :is-collapse="collapseInTaskCard.notFinishCollapse">
+											<task-card-title :task-list-id="`notFinish`" :is-collapse="isCollapseInTaskCardObj.notFinishCollapse" @collapse-task-list="collapseTaskCard">
 												<p>未完成</p>
-											</task-card>
+											</task-card-title>
 										</div>
 										<div>
 											<!-- 已经过期的任务 -->
-											<task-card :is-controller="true" :task-list-id="`over`" :is-collapse="collapseInTaskCard.overCollapse">
+											<task-card-title :task-list-id="`over`" :is-collapse="isCollapseInTaskCardObj.overCollapse" @collapse-task-list="collapseTaskCard">
 												<p>已过期</p>
-											</task-card>
+											</task-card-title>
 										</div>
 									</template>
 								</DashboardCard>
@@ -86,7 +86,7 @@ import { useWindowSize } from "@vueuse/core";
 import { Refresh, EditPen } from "@element-plus/icons-vue";
 import DashboardCard from "@/views/dashboard/components/DashboardCard.vue";
 import { useStore } from "@/store/index";
-import TaskCard from "./components/task/TaskCardTitle.vue";
+import TaskCardTitle from "@/components/task/taskList/TaskCardTitle.vue";
 
 interface windowSizeInterface {
 	heightComputed: number;
@@ -120,10 +120,20 @@ const dashboardLayout: ComputedRef<string> = computed<string>(() => {
 });
 
 // 该对象标记两个折叠栏是否折叠，默认为打开（false）
-const collapseInTaskCard = reactive({
+const isCollapseInTaskCardObj = reactive({
 	notFinishCollapse: false,
 	overCollapse: false,
 });
+
+const collapseTaskCard = (id: string) => {
+	if (id === "notFinish") {
+		isCollapseInTaskCardObj.notFinishCollapse = !isCollapseInTaskCardObj.notFinishCollapse;
+	} else if (id === "over") {
+		isCollapseInTaskCardObj.overCollapse = !isCollapseInTaskCardObj.overCollapse;
+	} else {
+		console.error("no id");
+	}
+};
 
 const editableHeaderButtonText = ref("设置面板");
 </script>
