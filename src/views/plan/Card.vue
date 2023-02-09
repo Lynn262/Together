@@ -3,9 +3,7 @@
 		<template #header>
 			<div class="card-header">
 				<span>{{ name }}</span>
-				<div class="state">
-					{{ state === "now" ? "进行中" : state === "ready" ? "未开始" : "已逾期" }}
-				</div>
+				<TaskStatus :status="props.state"></TaskStatus>
 			</div>
 		</template>
 		<div class="describe">
@@ -18,34 +16,27 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
-const props = defineProps({
-	name: {
-		type: String,
-		default: "这是一个任务",
-	},
-	state: {
-		type: String,
-		//now 进行中 ready 未开始 expire 已逾期
-		default: "ready",
-	},
-	id: {
-		type: Number,
-		default: 27,
-	},
-	startTime: {
-		type: String,
-		default: "2023-1-1",
-	},
-	endTime: {
-		type: String,
-		default: "2023-1-1",
-	},
+import { priorityColorComputer, stateType } from "@/utils/PriorityColorCompute";
+import TaskStatus from "@/components/task/TaskStatus.vue";
+
+interface CardProps {
+	name: string;
+	state: stateType;
+	id: number;
+	startTime: string;
+	endTime: string;
+}
+
+const props = withDefaults(defineProps<CardProps>(), {
+	name: "这是一个任务",
+	state: "ready",
+	id: -1,
+	startTime: "2023-1-1",
+	endTime: "2023-1-1",
 });
+
 const borderColor = computed<String>(() => {
-	if (props.state === "ready") return "#f6c659";
-	else if (props.state === "now") return "#73d897";
-	else if (props.state === "finished") return "#95a6bf";
-	return "#fa8888";
+	return priorityColorComputer(props.state);
 });
 </script>
 <style lang="less" scoped>
@@ -55,15 +46,6 @@ const borderColor = computed<String>(() => {
 
 	.card-header {
 		font-size: 20px;
-
-		.state {
-			background-color: var(--border-left-color);
-			width: 80px;
-			font-size: 16px;
-			color: white;
-			border-radius: 5px;
-			text-align: center;
-		}
 	}
 
 	.describe {

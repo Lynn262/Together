@@ -1,7 +1,8 @@
 <template>
-	<div class="task-list" @click="collapse">
+	<div class="task-list-title" @click="collapse">
 		<div class="header-icon">
-			<el-icon :size="30"><ArrowRight /></el-icon>
+			<el-icon :size="30" v-if="props.isCollapse"><ArrowRight /></el-icon>
+			<el-icon :size="30" v-else><ArrowDown /></el-icon>
 		</div>
 		<div class="content">
 			<slot></slot>
@@ -10,17 +11,16 @@
 </template>
 
 <script setup lang="ts">
+import { ArrowDown, ArrowRight } from "@element-plus/icons-vue";
 import { ref, Ref } from "vue";
 
 interface Props {
-	isController: boolean;
 	isCollapse: boolean;
 	taskListId: string;
 }
 
 // withDefaults 可以设置props的默认属性
 const props = withDefaults(defineProps<Props>(), {
-	isController: false,
 	isCollapse: false,
 	taskListId: "",
 });
@@ -38,7 +38,7 @@ const collapse = () => {
 @task-list-height: 50px;
 @title-font-size: 16px;
 
-.task-list {
+.task-list-title {
 	border-bottom: 1px solid #eee;
 	display: flex;
 	height: @task-list-height;
