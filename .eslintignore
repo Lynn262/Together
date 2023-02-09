@@ -1,0 +1,9 @@
+/node_modules
+/dist
+/src/assets/js
+/package-lock.json
+/package.json
+.DS_Store
+vue.config.js
+.prettierrc.json
+.eslintrc.json

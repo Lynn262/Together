@@ -1,0 +1,11 @@
+{
+	"semi": true,
+  "doubleQuote": true,
+  "eslintIntegration": true,
+  "endOfLine": "auto",
+	"useTabs": true,
+  "tabWidth": 2,
+  "htmlWhitespaceSensitivity": "ignore",
+  "bracketSameLine": true,
+  "printWidth": 999
+}
