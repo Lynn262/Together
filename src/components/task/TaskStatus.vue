@@ -6,19 +6,18 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { stateType, priorityColorComputer } from "@/utils/PriorityColorCompute";
+import { stateType, statusColorComputer } from "@/utils/task/StatusColorCompute";
 
 const props = defineProps<{
 	status: stateType;
 }>();
 const statusColor = computed(() => {
-	return priorityColorComputer(props.status);
+	return statusColorComputer(props.status);
 });
 </script>
 
 <style scoped lang="less">
 .status {
-	background-color: var(--border-left-color);
 	width: 80px;
 	font-size: 16px;
 	color: white;

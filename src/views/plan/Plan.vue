@@ -29,7 +29,7 @@
 					<div class="planlist">
 						<el-input v-model="searchInput" class="search" placeholder="search something" :prefix-icon="`search`" @keyup.enter="searchTask" />
 						<el-scrollbar :height="windowHeight - 60 - 60 - 32">
-							<Card :state="(item.state as stateType)" :end-time="item.endTime" :start-time="item.startTime" :name="item.name" v-for="(item, index) in CardTaskData" :key="index"></Card>
+							<TaskCard :task-status="(item.taskStatus as stateType)" :priority="item.priority" :task-deadline="item.taskDeadline" :task-start-time="item.taskStartTime" :task-name="item.taskName" v-for="(item, index) in CardTaskData" :key="index"></TaskCard>
 						</el-scrollbar>
 					</div>
 					<div class="addplan">
@@ -43,7 +43,7 @@
 					</div>
 					<div class="today-list">
 						<el-scrollbar :height="windowHeight - 60 - 60">
-							<TaskToday v-for="(item, index) in TodayTaskData" :name="item.name" :state="item.state" :key="index"></TaskToday>
+							<TaskCard :task-status="(item.taskStatus as stateType)" :priority="item.priority" :task-deadline="item.taskDeadline" :task-start-time="item.taskStartTime" :task-name="item.taskName" v-for="(item, index) in TodayTaskData" :key="index"></TaskCard>
 							<div class="card" v-if="addTask">
 								<div class="text-area">
 									<el-input v-model="TaskForm.name" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="Please input" />
@@ -67,17 +67,39 @@
 
 <script lang="ts" setup>
 import { Search } from "@element-plus/icons-vue";
-import { reactive, toRefs, ref, onMounted, ComputedRef } from "vue";
+import { reactive, toRefs, ref, onMounted, ComputedRef, Ref } from "vue";
 import Header from "@/components/Header.vue";
-import Card from "@/views/plan/Card.vue";
-import TaskToday from "@/views/plan/TaskToday.vue";
+import TaskCard from "@/views/plan/TaskCard.vue";
 import { useWindowSize } from "@vueuse/core";
 import { flatMap } from "lodash";
 import { computed } from "@vue/reactivity";
 import dayjs from "dayjs";
-import { stateType } from "@/utils/PriorityColorCompute";
+import { stateType } from "@/utils/task/StatusColorCompute";
+import { TaskCardContentInterface } from "../../components/task/TaskCardContentInterface";
 
 const { width, height } = useWindowSize();
+const CardTaskData: Ref<TaskCardContentInterface[]> = ref([
+	{
+		taskName: "任务1",
+		taskStatus: "ready",
+		taskStartTime: "2023-1-1",
+		taskDeadline: "2023-1-2",
+		id: 1,
+		priority: "important",
+	},
+]);
+
+const TodayTaskData: Ref<TaskCardContentInterface[]> = ref([
+	{
+		taskName: "任务1",
+		taskStatus: "ready",
+		taskStartTime: "2023-1-1",
+		taskDeadline: "2023-1-2",
+		id: 2,
+		priority: "important",
+	},
+]);
+
 const state = reactive({
 	imgsrc: "/src/assets/iconfont/plan-black.svg",
 	title: "任务清单",
@@ -87,52 +109,6 @@ const state = reactive({
 	addTask: false,
 	textarea2: "",
 	dialogVisible: false,
-	TodayTaskData: [
-		{
-			name: "第一个任务",
-			state: "finished",
-		},
-		{
-			name: "第2个任务",
-			state: "ready",
-		},
-		{
-			name: "第三个任务",
-			state: "ready",
-		},
-	],
-	CardTaskData: [
-		{
-			name: "任务1",
-			state: "ready",
-			startTime: "2023-1-1",
-			endTime: "2023-1-2",
-		},
-		{
-			name: "任务1",
-			state: "now",
-			startTime: "2023-1-1",
-			endTime: "2023-1-1",
-		},
-		{
-			name: "任务1",
-			state: "ready",
-			startTime: "2023-1-1",
-			endTime: "2023-1-1",
-		},
-		{
-			name: "这是一个任务",
-			state: "expire",
-			startTime: "2023-1-1",
-			endTime: "2023-1-1",
-		},
-		{
-			name: "任务1",
-			state: "expire",
-			startTime: "2023-1-1",
-			endTime: "2023-1-1",
-		},
-	],
 	Form: {
 		name: "",
 		startTime: "",
@@ -143,7 +119,7 @@ const state = reactive({
 		deadline: "",
 	},
 });
-const { imgsrc, title, searchInput, windowWidth, windowHeight, addTask, textarea2, dialogVisible, TodayTaskData, Form, CardTaskData, TaskForm } = toRefs(state);
+const { imgsrc, title, searchInput, windowWidth, windowHeight, addTask, textarea2, dialogVisible, Form, TaskForm } = toRefs(state);
 
 const change = () => {
 	console.log("change");
@@ -153,27 +129,33 @@ const change = () => {
 const addCompanyTask = () => {
 	dialogVisible.value = true;
 };
+
+//获取任务的百分比
 const percent = computed(() => {
-	const finishedTask = TodayTaskData.value.filter((item) => item.state === "finished");
+	const finishedTask = TodayTaskData.value.filter((item) => item.taskStatus === "finished");
 	return parseInt(((finishedTask.length / TodayTaskData.value.length) * 100).toFixed(0));
 });
 
 const searchTask = () => {
 	//这里是查询到的任务
-	const CardFilter = CardTaskData.value.filter((item) => item.name.indexOf(searchInput.value) !== -1);
+	const CardFilter = CardTaskData.value.filter((item) => item.taskName.indexOf(searchInput.value) !== -1);
 	console.log(CardFilter);
 };
 
 const check = () => {
 	const before = dayjs().isBefore(dayjs(Form.value.startTime));
 	const after = dayjs().isAfter(dayjs(Form.value.deadline));
-	const obj = {
-		name: Form.value.name,
-		state: after ? "expire" : before ? "ready" : "now",
-		startTime: dayjs(Form.value.startTime).format("YYYY-MM-DD"),
-		endTime: dayjs(Form.value.deadline).format("YYYY-MM-DD"),
+	//需要传入的对象
+	const objPush: TaskCardContentInterface = {
+		taskName: Form.value.name,
+		taskStatus: after ? "expire" : before ? "ready" : "now",
+		taskStartTime: dayjs(Form.value.startTime).format("YYYY-MM-DD"),
+		taskDeadline: dayjs(Form.value.deadline).format("YYYY-MM-DD"),
+		//这里有一个后端定值需求
+		id: 0,
+		priority: "p",
 	};
-	CardTaskData.value.push(obj);
+	CardTaskData.value.push(objPush);
 	Form.value = {
 		name: "",
 		startTime: "",
