@@ -1,8 +1,10 @@
+import { priorityType } from "../../utils/task/PriorityColorCompute";
+import { stateType } from "../../utils/task/StatusColorCompute";
 export interface TaskCardContentInterface {
-	priority: string;
+	priority: priorityType;
 	id: number;
 	taskName: string;
-	taskStatus: string;
+	taskStatus: stateType;
 	taskDeadline: string;
 	taskStartTime?: string;
 }
