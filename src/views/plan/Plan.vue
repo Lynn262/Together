@@ -29,7 +29,7 @@
 					<div class="planlist">
 						<el-input v-model="searchInput" class="search" placeholder="search something" :prefix-icon="`search`" @keyup.enter="searchTask" />
 						<el-scrollbar :height="windowHeight - 60 - 60 - 32">
-							<TaskCard :task-status="(item.taskStatus as stateType)" :priority="item.priority" :task-deadline="item.taskDeadline" :task-start-time="item.taskStartTime" :task-name="item.taskName" v-for="(item, index) in CardTaskData" :key="index"></TaskCard>
+							<TaskCard :task-status="(item.taskStatus as stateType)" :priority="item.priority" :task-deadline="item.taskDeadline" :task-start-time="item.taskStartTime" :task-name="item.taskName" v-for="(item, index) in AllTaskDataRef" :key="index"></TaskCard>
 						</el-scrollbar>
 					</div>
 					<div class="addplan">
@@ -43,7 +43,7 @@
 					</div>
 					<div class="today-list">
 						<el-scrollbar :height="windowHeight - 60 - 60">
-							<TaskCard :task-status="(item.taskStatus as stateType)" :priority="item.priority" :task-deadline="item.taskDeadline" :task-start-time="item.taskStartTime" :task-name="item.taskName" v-for="(item, index) in TodayTaskData" :key="index"></TaskCard>
+							<TaskCard :task-status="(item.taskStatus as stateType)" :priority="item.priority" :task-deadline="item.taskDeadline" :task-start-time="item.taskStartTime" :task-name="item.taskName" v-for="(item, index) in TodayTaskDataRef" :key="index"></TaskCard>
 							<div class="card" v-if="addTask">
 								<div class="text-area">
 									<el-input v-model="TaskForm.name" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="Please input" />
@@ -69,7 +69,7 @@
 import { Search } from "@element-plus/icons-vue";
 import { reactive, toRefs, ref, onMounted, ComputedRef, Ref } from "vue";
 import Header from "@/components/Header.vue";
-import TaskCard from "@/views/plan/TaskCard.vue";
+import TaskCard from "@/components/task/TaskCard.vue";
 import { useWindowSize } from "@vueuse/core";
 import { flatMap } from "lodash";
 import { computed } from "@vue/reactivity";
@@ -78,7 +78,8 @@ import { stateType } from "@/utils/task/StatusColorCompute";
 import { TaskCardContentInterface } from "../../components/task/TaskCardContentInterface";
 
 const { width, height } = useWindowSize();
-const CardTaskData: Ref<TaskCardContentInterface[]> = ref([
+
+const AllTaskData: TaskCardContentInterface[] = [
 	{
 		taskName: "任务1",
 		taskStatus: "ready",
@@ -87,9 +88,9 @@ const CardTaskData: Ref<TaskCardContentInterface[]> = ref([
 		id: 1,
 		priority: "important",
 	},
-]);
+];
 
-const TodayTaskData: Ref<TaskCardContentInterface[]> = ref([
+const TodayTaskData: TaskCardContentInterface[] = [
 	{
 		taskName: "任务1",
 		taskStatus: "ready",
@@ -98,8 +99,10 @@ const TodayTaskData: Ref<TaskCardContentInterface[]> = ref([
 		id: 2,
 		priority: "important",
 	},
-]);
+];
 
+const AllTaskDataRef: Ref<TaskCardContentInterface[]> = ref(AllTaskData);
+const TodayTaskDataRef: Ref<TaskCardContentInterface[]> = ref(TodayTaskData);
 const state = reactive({
 	imgsrc: "/src/assets/iconfont/plan-black.svg",
 	title: "任务清单",
@@ -132,13 +135,13 @@ const addCompanyTask = () => {
 
 //获取任务的百分比
 const percent = computed(() => {
-	const finishedTask = TodayTaskData.value.filter((item) => item.taskStatus === "finished");
-	return parseInt(((finishedTask.length / TodayTaskData.value.length) * 100).toFixed(0));
+	const finishedTask = TodayTaskDataRef.value.filter((item) => item.taskStatus === "expire");
+	return parseInt(((finishedTask.length / TodayTaskDataRef.value.length) * 100).toFixed(0));
 });
 
 const searchTask = () => {
 	//这里是查询到的任务
-	const CardFilter = CardTaskData.value.filter((item) => item.taskName.indexOf(searchInput.value) !== -1);
+	const CardFilter = AllTaskDataRef.value.filter((item) => item.taskName.indexOf(searchInput.value) !== -1);
 	console.log(CardFilter);
 };
 
@@ -153,9 +156,9 @@ const check = () => {
 		taskDeadline: dayjs(Form.value.deadline).format("YYYY-MM-DD"),
 		//这里有一个后端定值需求
 		id: 0,
-		priority: "p",
+		priority: "important",
 	};
-	CardTaskData.value.push(objPush);
+	AllTaskDataRef.value.push(objPush);
 	Form.value = {
 		name: "",
 		startTime: "",
