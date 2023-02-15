@@ -25,7 +25,7 @@
 				<Header :nav-img="imgsrc" :nav-name="title"></Header>
 			</el-header>
 			<el-container>
-				<el-aside width="50%">
+				<div class="task-list">
 					<div class="planlist">
 						<el-input v-model="searchInput" class="search" placeholder="search something" :prefix-icon="`search`" @keyup.enter="searchTask" />
 						<el-scrollbar :height="windowHeight - 60 - 60 - 32">
@@ -35,8 +35,8 @@
 					<div class="addplan">
 						<el-button text @click="addCompanyTask">+ 添加新任务</el-button>
 					</div>
-				</el-aside>
-				<el-main>
+				</div>
+				<div class="task-list">
 					<div class="todo">
 						<div class="text">今日任务:</div>
 						<el-progress :percentage="percent" />
@@ -59,7 +59,7 @@
 							<el-button class="add-task" v-else text @click="change">+ 添加新任务</el-button>
 						</el-scrollbar>
 					</div>
-				</el-main>
+				</div>
 			</el-container>
 		</el-container>
 	</div>
@@ -175,14 +175,9 @@ const check = () => {
 		height: 100%;
 		overflow: hidden;
 
-		.el-aside {
+		.task-list {
 			overflow: hidden;
-		}
-
-		.el-main {
-			overflow: hidden;
-			padding: 0;
-
+			width: 500px;
 			.todo {
 				padding-left: 10px;
 				border-bottom: 1px solid #efefef;
