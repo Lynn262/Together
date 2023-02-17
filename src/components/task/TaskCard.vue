@@ -1,5 +1,24 @@
 <template>
-	<el-card class="box-card" :style="cardStyleObjectRef" @mousedown="initDrag">
+	<!-- 模糊背景 -->
+	<el-card class="box-card-shadow" :style="{ '--border-left-color': '#494949', position: 'static', margin: cardMargin + 'px' }" v-if="isDrag">
+		<template #header></template>
+	</el-card>
+	<!-- mousedown事件触发元素 -->
+	<el-card class="box-card" :style="{ '--border-left-color': borderColor, position: 'static', margin: cardMargin + 'px' }" @mousedown="initDrag" v-if="!isDrag">
+		<template #header>
+			<div class="card-header">
+				<span>{{ props.taskName }}</span>
+				<TaskStatus :status="(props.taskStatus as stateType)"></TaskStatus>
+			</div>
+		</template>
+		<div class="describe">
+			<div class="identify">任务编号:{{ props.id }}</div>
+			<div class="start" v-if="props.taskStartTime !== ''">开始时间:{{ props.taskStartTime }}</div>
+			<div class="deadline" v-if="props.taskDeadline !== ''">截止时间:{{ props.taskDeadline }}</div>
+		</div>
+	</el-card>
+	<!-- mousemove mouseup事件触发元素 -->
+	<el-card class="box-card box-card-drag" :style="cardStyleObjectRef" @mousedown="initDrag" v-if="isDrag">
 		<template #header>
 			<div class="card-header">
 				<span>{{ props.taskName }}</span>
@@ -19,7 +38,7 @@ import { computed, ref, Ref } from "vue";
 import { stateType } from "@/utils/task/StatusColorCompute";
 import TaskStatus from "@/components/task/TaskStatus.vue";
 import { priorityColorComputer, priorityType } from "../../utils/task/PriorityColorCompute";
-import { DragCardStyleInterface, initDragUtil } from "../../utils/dragUtils";
+import { CardPositionTransform, DragCardStyleInterface, initDragUtil, MousePositionTransform } from "../../utils/dragUtils";
 
 interface TaskCardContentInterfaceImpl {
 	priority: priorityType;
@@ -49,28 +68,54 @@ interface CardStyleInterface extends DragCardStyleInterface {
 	"--border-left-color": String;
 	zIndex: number;
 }
+const cardMargin = ref(10);
 
 //样式对象
 const cardStyleObject: CardStyleInterface = {
 	"--border-left-color": borderColor.value,
-	position: "relative",
 	left: "0px",
 	top: "0px",
+	height: "0px",
+	width: "0px",
 	zIndex: 2006,
+	margin: cardMargin.value,
 };
 
 const cardStyleObjectRef: Ref<CardStyleInterface> = ref(cardStyleObject);
 
+const mousePositionTransform: Ref<MousePositionTransform> = ref({
+	x: 0,
+	y: 0,
+	press: false,
+});
+const cardPositionTransform: Ref<CardPositionTransform> = ref({
+	x: 0,
+	y: 0,
+});
+
+const isDrag = ref(false);
 const initDrag = (e: PointerEvent) => {
-	initDragUtil(e, cardStyleObjectRef);
+	isDrag.value = true;
+	console.log(e.currentTarget);
+	initDragUtil(e, cardStyleObjectRef, mousePositionTransform, cardPositionTransform, isDrag);
 };
 </script>
 <style lang="less" scoped>
+@card-height: 250px;
+
+.box-card-shadow {
+	width: 400px;
+	box-sizing: border-box;
+	height: @card-height;
+	border-left: 5px solid var(--border-left-color);
+	background-color: #5a5a5a;
+}
+
 .box-card {
-	width: calc(100% - 20px);
-	margin: 10px;
+	width: 400px;
 	box-sizing: border-box;
 	border-left: 5px solid var(--border-left-color);
+	height: @card-height;
 
 	.card-header {
 		font-size: 20px;
@@ -93,5 +138,9 @@ const initDrag = (e: PointerEvent) => {
 			}
 		}
 	}
+}
+.box-card-drag {
+	margin: 10px;
+	position: fixed;
 }
 </style>
