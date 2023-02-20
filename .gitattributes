@@ -1,0 +1,5 @@
+*.tsx linguist-language=Typescript
+*.vue linguist-language=Vue
+*.HTML linguist-language=HTML
+*.less linguist-language=Less
+*.css linguist-language=CSS
